@@ -19,7 +19,7 @@
         if( !empty($_POST['id']) && ctype_digit($_POST['id'])  ) {
             
             $recette_id = $_POST['id'];
-        
+
 
            if(!$recette_id) {
 
@@ -27,10 +27,10 @@
            } 
 
            //find if the RECETTE EXIST
-           $recette = $this->model->find($recette_id);  
+           $recette = $this->model->find($recette_id, $this->modelName);  
 
            //
-           $gateau_id = $recette['gateau_id'];
+           $gateau_id = $recette->gateau_id;
 
            if(!$recette) {
 
@@ -48,7 +48,50 @@
 
         }
 
-    }
+}
+
+    /**
+     * 
+     * Delete Recette
+     * 
+     */
+    public function supprApi() {
+
+        if( !empty($_POST['id']) && ctype_digit($_POST['id'])  ) {
+            
+            
+            $recette_id = $_POST['id'];
+
+           if(!$recette_id) {
+
+                die("Sorry, you have to add id to the URL");
+           } 
+
+           //find if the RECETTE EXIST
+           $recette = $this->model->find($recette_id, $this->modelName);  
+
+           //
+           $gateau_id = $recette->gateau_id;
+
+           if(!$recette) {
+
+                die("Sorry, this recette don't exist");
+
+           }
+
+           //Delete recette
+           $this->model->delete($recette_id);
+
+                    header('Access-Control-Allow-Origin: *');
+
+                    $message = "Delete was successfull";
+
+                    echo json_encode($message);
+                 
+
+        }
+
+}
 
     
         /**
@@ -59,6 +102,9 @@
 
 public function create()
     {
+         $userModel = new \Model\User();
+        $user = $userModel->getUser();
+
         $formulaireAAfficher = true;
         
         if(
@@ -98,18 +144,18 @@ public function create()
 
                     if($modeEdition){
 
-                        $recette = $this->model->find($recette_id);
+                        $recette = $this->model->find($recette_id, $this->modelName);
                   
                         $titreDeLaPage = "Editer la recette";
 
-                        \Rendering::render('recettes/create', compact('modeEdition','recette','titreDeLaPage'));
+                        \Rendering::render('recettes/create', compact('user','modeEdition','recette','titreDeLaPage'));
 
 
                     }else{  
                         
                     $titreDeLaPage = "Nouvelle recette";
 
-                    \Rendering::render('recettes/create', compact('modeEdition','gateau_id','titreDeLaPage'));
+                    \Rendering::render('recettes/create', compact('user','modeEdition','gateau_id','titreDeLaPage'));
 
                     }
 
@@ -126,14 +172,14 @@ public function create()
             $name = htmlspecialchars($name);
             $description = htmlspecialchars($description);
 
-            $this->model->insert($name, $description, $gateau_id);
+            $this->model->insert($name, $description, $gateau_id, $user->id);
  
             \Http::redirect("index.php?controller=gateau&task=show&id=$gateau_id");
 
         }
 
 
-    }
+}
 
 
 
@@ -142,7 +188,7 @@ public function create()
      * 
      * 
      */
-    public function update()
+public function update()
     {
         $recette_id =null;
         $name = null;
@@ -165,8 +211,8 @@ public function create()
 
         }
 
-                $recette = $this->model->find($recette_id);
-                $gateau_id = $recette['gateau_id'];
+                $recette = $this->model->find($recette_id, $this->modelName);
+                $gateau_id = $recette->gateau_id;
 
              $this->model->edit($recette_id, $name, $description);
 
@@ -175,7 +221,7 @@ public function create()
 
 
 
-    }
+}
 
 
 

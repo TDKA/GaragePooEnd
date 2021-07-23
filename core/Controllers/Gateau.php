@@ -6,24 +6,42 @@ class Gateau extends Controller {
 
     protected $modelName = \Model\Gateau::class;
 
+/**
+ * 
+ * 
+ */
+public function indexApi() {
+
+    $gateaux = $this->model->findAll($this->modelName);
+
+    header('Access-Control-Allow-Origin: *');
+
+    echo json_encode($gateaux);
+
+}
+
+
     /**
      * 
      * show all the cakes
      * 
      * index() call ALL the items  - "findAll()" from the db
      */
+public function index()  {
 
-    public function index()  {
+        
+        $modelUser = new \Model\User();
+        $user = $modelUser->getUser();
 
-        $myGateaux = $this->model->findAll();
+        $myGateaux = $this->model->findAll($this->modelName);
 
         $titlePage = "Gateaux";
-
+        
         \Rendering::render("gateaux/gateaux",
-                compact('myGateaux', 'titlePage')
+                compact('user', 'myGateaux', 'titlePage')
             );
 
-    }
+}
 
 
 
@@ -33,12 +51,18 @@ class Gateau extends Controller {
      */
 public function show() {
 
+        $modelUser = new \Model\User();
+        $user = $modelUser->getUser();
+
+
         $gateau_id= null;
+
 
         // ctype_digit / empty methods
         if(!empty($_GET['id']) && ctype_digit($_GET['id']) ) {
 
             $gateau_id = $_GET['id'];
+            
         }
 
         if(!$gateau_id) {
@@ -46,7 +70,7 @@ public function show() {
         }
 
         /// ******* Find gateau ********* ///
-        $gateau = $this->model->find($gateau_id);
+        $gateau = $this->model->find($gateau_id, $this->modelName);
 
 
         ///// ****** Find Reccetes   ***** ///
@@ -54,16 +78,75 @@ public function show() {
         $recettes = $modelRecette->findAllByGateau($gateau_id); 
 
 
-        $titlePage = $gateau['name'];
+        $titlePage = $gateau->name;
+
+
+        // ********* Find MAKES for Cakes ********** ///
+        $modelMake = new \Model\Make();
+        $gateauMakes = $modelMake->findAllByGateau($gateau_id);
+
+        
+
            
         \Rendering::render("gateaux/gateau",
 
-        compact('gateau','recettes', 'titlePage')
+        compact('user','gateauMakes','gateau','recettes', 'titlePage')
 
         );
 
 }
 
+/**
+ * 
+ * 
+ */
+public function showApi() {
+
+        $modelUser = new \Model\User();
+        $user = $modelUser->getUser();
+
+
+        $gateau_id= null;
+
+
+        // ctype_digit / empty methods
+        if(!empty($_GET['id']) && ctype_digit($_GET['id']) ) {
+
+            $gateau_id = $_GET['id'];
+            
+        }
+
+        if(!$gateau_id) {
+            die("Add id in the URL"); 
+        }
+
+        /// ******* Find gateau ********* ///
+        $gateau = $this->model->find($gateau_id, $this->modelName);
+
+
+        ///// ****** Find Reccetes   ***** ///
+        $modelRecette = new \Model\Recette();
+        $recettes = $modelRecette->findAllByGateau($gateau_id); 
+
+
+        $titlePage = $gateau->name;
+
+
+        // ********* Find MAKES for Cakes ********** ///
+        $modelMake = new \Model\Make();
+        $gateauMakes = $modelMake->findAllByGateau($gateau_id);
+
+        
+    header('Access-Control-Allow-Origin: *');
+
+    echo json_encode([
+        'gateau' => $gateau,
+        'recettes' => $recettes
+    ]);
+           
+
+
+}
 
 
      /**
@@ -82,7 +165,7 @@ public function suppr() {
                 if($gateau_id) {
                 
                     //Check if the gateu exist
-                    $gateau = $this->model->find($gateau_id);
+                    $gateau = $this->model->find($gateau_id, $this->modelName);
 
                 if(!$gateau) {
 
@@ -103,16 +186,19 @@ public function suppr() {
 
 
 
+
+
 /**
  * 
  * 
  * Show form "create NEW GATEAU" or  "edit THIS GATEAU"
  * 
  */
- public function create()
+ public function create() {
 
- 
-    {
+    $modelUser = new \Model\User();
+    $user = $modelUser->getUser();
+
         $gateauACreer= false;
 
         $name = null;
@@ -126,7 +212,7 @@ public function suppr() {
     }
         if($gateauACreer){
 
-                    $this->model->insert($name, $base);
+                    $this->model->insert($name, $base, $user->id);
 
                      \Http::redirect("index.php?controller=gateau&task=index");
 
@@ -145,27 +231,22 @@ public function suppr() {
             if(!$modeEdition){
                             $gateau = null;
                             $titreDeLaPage = "nouveau gateau";
-                            \Rendering::render('gateaux/create', compact('gateau','titreDeLaPage')); 
+                            \Rendering::render('gateaux/create', compact('user','gateau','titreDeLaPage')); 
             }else{ 
                 
-                $gateau = $this->model->find($gateau_id);
-                $nomGateau = $gateau['name'];
+                $gateau = $this->model->find($gateau_id, $this->modelName);
+                $nomGateau = $gateau->name;
 
 
                 $titreDeLaPage = "Editer $nomGateau";
-                \Rendering::render('gateaux/create', compact('gateau','titreDeLaPage')); 
+                \Rendering::render('gateaux/create', compact('user','gateau','titreDeLaPage')); 
 
             }
 
 
         }
 
-    }
-
-
-
-
-
+}
 
 /**
  * 
@@ -196,8 +277,3 @@ public function suppr() {
 
 
 }
-
-
-
-
-?>

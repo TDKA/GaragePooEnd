@@ -1,3 +1,4 @@
+
 <?php  if($modeEdition) { ?>
 
 
@@ -5,14 +6,14 @@
     
         <h3>Edit cette recette</h3>
 
-         <input type="hidden" name="recetteId" value="<?php echo $recette['id']?>">
+         <input type="hidden" name="recetteId" value="<?php echo $recette->id?>">
 
         <div class="form-group">
-            <textarea  class="form-control" name="name" id="" cols="30" rows="2" ><?php echo $recette['name'] ?></textarea>
+            <textarea  class="form-control" name="name" id="" cols="30" rows="2" ><?php echo $recette->name ?></textarea>
         </div>
     
         <div class="form-group mt-3">
-            <textarea  class="form-control" name="description" id="" cols="30" rows="2" ><?php echo $recette['description'] ?></textarea>
+            <textarea  class="form-control" name="description" id="" cols="30" rows="2" ><?php echo $recette->description?></textarea>
         </div>
         <div class="form-group">
             <button type="submit" class="btn btn-success mt-2">Enregistrer les modification </button>

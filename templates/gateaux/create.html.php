@@ -23,16 +23,16 @@
 
 <form action="index.php?controller=gateau&task=edit" method="POST" class="row col-md-6">
 
-<input type="hidden" name="id" value="<?php echo $gateau['id'] ?>">
+<input type="hidden" name="id" value="<?php echo $gateau->id ?>">
     
             <h3>Modifier le gateau</h3>
 
             <div class="form-group">
-                <textarea  class="form-control" name="name" id="" cols="30" rows="2"><?php echo $gateau['name'] ?></textarea>
+                <textarea  class="form-control" name="name" id="" cols="30" rows="2"><?php echo $gateau->name ?></textarea>
             </div>
         
             <div class="form-group mt-3">
-                <textarea  class="form-control" name="base" id="" cols="30" rows="2" > <?php echo $gateau['base'] ?></textarea>
+                <textarea  class="form-control" name="base" id="" cols="30" rows="2" > <?php echo $gateau->base ?></textarea>
             </div>
             <div class="form-group">
                 <button type= "submit" class="btn btn-warning mt-2">Enregistrer les modifications </button>

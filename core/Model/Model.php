@@ -2,32 +2,47 @@
 
 namespace Model;
 
+use PDO;
+
 
 abstract class Model {
 
     protected $pdo;
     protected $table;
+   
+ 
 
     //PDO
     public function __construct() {
         
         $this->pdo = \Database::getPdo();
+     
     }
 
-    
     /**
      * find garage from its id and 
      * return an array of ONE GARAGE that contains the ID of this garage  or boolean if its the garage don't exist
-     * @param int
+     * @param int $id
+     * @param string $className
      * @return array|bool 
      */
-    public function find(int $id) {
+    public function find(int $id, string $className, ? string $table = null ) {
 
-        $requete = $this-> pdo-> prepare("SELECT * FROM  {$this->table} WHERE id = :id");
+        $sql = "SELECT * FROM  {$this->table} WHERE id = :id" ;
+
+
+        if(!empty($table)) {
+
+            $sql = "SELECT * FROM $table WHERE id = :id" ;
+
+        }  
+            
+            
+        $requete = $this-> pdo-> prepare($sql);
 
         $requete->execute(['id' => $id]);
 
-        $item = $requete->fetch() ;
+        $item = $requete->fetchObject($className) ;
 
         return $item; 
 
@@ -41,11 +56,11 @@ abstract class Model {
      * @return array
      * 
      */
-    public function findAll() :array {
+    public function findAll(string $className) :array {
 
-        $result = $this->pdo -> query("SELECT * FROM {$this->table}");
+        $result = $this->pdo->query("SELECT * FROM {$this->table}");
 
-        $items = $result -> fetchAll();
+        $items = $result->fetchAll( PDO::FETCH_CLASS, $className );
 
         return $items;
     }

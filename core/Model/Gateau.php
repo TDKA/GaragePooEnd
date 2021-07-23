@@ -6,8 +6,25 @@ class Gateau extends Model {
 
     protected $table = "gateaux";
 
+    public $id;
+    public $name;
+    public $base;
+    public $user_id;
 
+/**
+ * 
+ * Get all "MAKES" per Garage(id)
+ * 
+ */
+public function getMakes() {
     
+    $modelMake = new \Model\Make;
+    $nbMakes =  $modelMake->findAllByGateau($this->id);
+
+    return $nbMakes;
+}
+
+
     /**
      * Insert NEW gateaux
      * @param string $name
@@ -15,21 +32,19 @@ class Gateau extends Model {
      * 
      * @return void
      */
-public function insert(string $name, string $base): void{
+public function insert(string $name, string $base, int $user_id): void{
 
 
-        $reqAddGateau = $this->pdo->prepare("INSERT INTO gateaux (name, base) 
-                                        VALUES (:name, :base)");
+        $reqAddGateau = $this->pdo->prepare("INSERT INTO gateaux (name, base , user_id) 
+                                        VALUES (:name, :base, :user_id)");
 
         $reqAddGateau->execute([
                                 'name' => $name,
-                                'base' => $base
+                                'base' => $base,
+                                'user_id' => $user_id
                             ]);
 
 }
-
-
-  
 
     /**
      * 
@@ -54,7 +69,23 @@ public function update(string $name, string $base, int $id) :void {
         
 }
 
+/**
+ * 
+ * Find the author of the gateau
+ * 
+ * 
+ */
+public function findAuthor() {
+    
+    //return Object of user so i can use findAuthor()->username / email / etc in the template
+    
+    return  $this->find($this->user_id, \Model\User::class, 'users');
+
 }
+
+
+}
+
 
 
 
